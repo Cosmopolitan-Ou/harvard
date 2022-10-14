@@ -7,7 +7,7 @@ This is a folder with codes to:
 - Evaluate Embedding
 - Get Evaluation Plots
 
-To run it, simply run the script **get_eval_embed.R**. But make sure you have the following files inside this folder (source code folder):
+To run it, simply run the script **get_eval_embed.R**. But make sure you have the following files available:
 - **MultiAxialHierarchy.csv**
 - **AllRelationPairsWithNull.Rdata**
 - Input data file, such as **rpdr_code_cooccurrence_victor_2019.csv**
