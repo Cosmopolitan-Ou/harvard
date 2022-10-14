@@ -12,4 +12,4 @@ To run it, simply run the script **get_eval_embed.R**. But make sure you have th
 - **AllRelationPairsWithNull.Rdata**
 - Input data file, such as **rpdr_code_cooccurrence_victor_2019.csv**
 
-You can tune the dimensions on varaible **dims**, each dimension may take 26-30 mins to run. The evaluation plots are saved as "Summary-XX-YY-ZZ", where XX stands for starting dimension, YY stands for endding dimension and ZZ stands for Step.
+You can tune the dimensions on varaible **dims**, each dimension may take 26-30 mins to run. The evaluation plots are saved as "Summary-XX-YY-ZZ.html", and the original summary data are saved as "Summary-XX-YY-ZZ.Rdata", where XX stands for starting dimension, YY stands for endding dimension and ZZ stands for Step.
