@@ -1,0 +1,60 @@
+---
+output: html_document
+---
+
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Evaluation of Embedding over Differnt Dimensions
+
+The original summary data file is save as **summary.Rdata**.<br/><br/>
+**Dimension Setting:** `r paste(dims, collapse = ", ")`.<br/>
+**Data File Used:** `r in_file`.<br/>
+**Evaluation Metric:** `r plot_val`.<br/><br/>
+For each dimension value, the process of embedding generation & evaluation will take about **26** to **30** mins depending on value size.<br/><br/>
+Note: To get all the outputs, simply run file **get_eval_embed.R**. Make sure the
+working directory is set to the **source file folder**, and all required files listed in **Parameter Setting** section are available.
+
+```{r, echo=FALSE}
+  
+# get plot data
+df_plot <- get_plot_data(summary, col = plot_val)  
+
+# split data by group (Similarity, Relation, Others)
+data_split <-  split_data(df_plot, patterns = split_patterns)
+
+# reshape split data for plot
+data_reshape <- lapply(names(data_split), function(x) {
+  reshape_data(data_split[[x]], y = "auc")
+})
+names(data_reshape) <- names(data_split)
+
+```
+
+## Evaluation Results {.tabset}
+
+### Similarity
+```{r, echo=FALSE}
+data_reshape$Similarity %>% plt()
+```
+<br/><br/><br/>
+
+### Relation
+```{r, echo=FALSE}
+data_reshape$Relation %>% plt()
+```
+<br/><br/><br/>
+      
+### Other
+```{r, echo=FALSE}
+data_reshape$Other %>% plt()
+```
+<br/><br/><br/>
+
+### Data
+```{r, echo=FALSE}
+DT::datatable(df_plot, options = list(scrollX = TRUE, scrollY = TRUE))
+```
+<br/><br/><br/>
