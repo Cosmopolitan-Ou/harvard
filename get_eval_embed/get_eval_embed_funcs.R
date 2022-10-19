@@ -1,6 +1,7 @@
 library(dplyr)
 library(pROC)
 library(plotly)
+library(gglot2)
 library(rmarkdown)
 library(DT)
 
@@ -425,7 +426,7 @@ Evaluate_tmp = function(embed, AllRelationPairs, evatype = "all", prop = 0.3){
     })
   }
   k = 3
-  anslist = lapply(1:28, function(i){
+  anslist = lapply(1:9, function(i){
     pairs = AllRelationPairs[[k]]
     pairs = pairs[which(pairs$id==i),]
     return(evalu_part(embed, pairs))
@@ -451,7 +452,7 @@ Evaluate_tmp = function(embed, AllRelationPairs, evatype = "all", prop = 0.3){
 #########################################################################
 
 # function to get plot data
-get_plot_data <- function(summary, col="auc", dim_name = "dims") {
+get_plot_data <- function(summary, col="auc", dim_name = "dims", labels = NULL) {
   l <- lapply(names(summary), function(d) {
     summary[[d]][[col]]
   })
@@ -460,6 +461,12 @@ get_plot_data <- function(summary, col="auc", dim_name = "dims") {
   row.names(df) <- names(summary)
   df <- df %>% t() %>% stats::na.omit() %>% t() %>% as.data.frame()  # delete NA Columns
   df[[dim_name]] <- as.numeric(row.names(df))
+  
+  # filter out columns if labels specified
+  if (!is.null(labels)) {
+    df <- df %>% dplyr::select(dplyr::one_of(append(dim_name, labels)))
+  }
+  
   return(df)
 } 
 
@@ -468,25 +475,26 @@ split_data <- function(plot_data, include.others = TRUE, dim_name = "dims",
                        patterns=list("Similarity" = "(sim)", "Relation" = "(rela)")) {
   
   # get groups by pattern
-  cols <- colnames(df_plot)
+  cols <- colnames(plot_data)
   splits <- lapply(names(patterns), function(p) {
     append(dim_name, cols[grepl(patterns[[p]], cols, fixed = TRUE)])
   })
   names(splits) <- names(patterns)
-  
+
   # get other group
   if (include.others) {
     other <- cols
     for (s in splits) {
       other <- setdiff(other, s)
     }
-    splits[["Other"]] <- append(dim_name, other)
+    if (length(other) > 0) {
+      splits[["Other"]] <- append(dim_name, other)
+    } else {splits[["Other"]] <- c()}
   }
  
-
   # get split data list
   out <- lapply(splits, function(s) {
-    df_plot[, s]
+    plot_data[, s]
   })
   return(out)
 }
@@ -505,7 +513,7 @@ reshape_data <- function(data, x = "dims", y = "vals", group = "pairs") {
 }
 
 # function to plot scatter-line by group 
-plt <- function(data, x="dims", y="auc", group = "pairs") {
+plt <- function(data, x="dims", y="auc", group = "pairs", method = "plotly") {
   
   m <- list(
     l = 50,
@@ -527,17 +535,31 @@ plt <- function(data, x="dims", y="auc", group = "pairs") {
     "<extra></extra>"
   )
   
-  data %>% plotly::group_by(!!group) %>%
-    plotly::plot_ly(x = as.formula(paste0('~', x)), 
-                    y = as.formula(paste0('~', y)), 
-                    type = "scatter",
-                    color = as.formula(paste0('~', group)),
-                    text = as.formula(paste0('~', group)),
-                    mode = "lines+markers",
-                    hovertemplate = hovertemplate) %>%
-    plotly::layout(autosize = F, width = 900, height = 500, margin = m,
-                   legend = list(orientation = 'h', y = -0.3),
-                   hovermode = "x unified")
+  if (method == "plotly") {
+    return(
+      data %>% plotly::group_by(!!group) %>%
+        plotly::plot_ly(x = as.formula(paste0('~', x)), 
+                        y = as.formula(paste0('~', y)), 
+                        type = "scatter",
+                        color = as.formula(paste0('~', group)),
+                        text = as.formula(paste0('~', group)),
+                        mode = "lines+markers",
+                        hovertemplate = hovertemplate) %>%
+        plotly::layout(autosize = F, width = 900, height = 500, margin = m,
+                       legend = list(orientation = 'h', y = -0.3),
+                       hovermode = "x unified")
+    )
+
+  } 
+  
+  if (method == "ggplot") {
+    return(
+      data %>% ggplot2::ggplot(
+        ggplot2::aes_string(x = x, y = y, group = group, color = group)
+      ) + ggplot2::geom_line() + ggplot2::geom_point()
+    )
+  }
+ 
 }
 
 #########################################################################
