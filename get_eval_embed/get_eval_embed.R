@@ -6,13 +6,18 @@
 in_file <- "rpdr_code_cooccurrence_victor_2019.csv"  # Data File to Obtain Embedding
 dims <- seq(100, 4000, 100)                          # Dimension Setting
 plot_val <- "auc"                                    # Metric for Evaluation (Columns in Summary.Rds Dataframes)
+knit_format <- "pdf"                                 # Format of Summary File - Should be "html" or "pdf"
+labels <- c("PheCode-PheCode(sim)", "RXNORM-RXNORM(sim)", "LAB-LAB(sim)",
+            "PheCode-PheCode(rela)", "PheCode-RXNORM(rela)",
+            "PheCode-LAB(rela)")                     # Labels to include in Summary - If NULL Then Include All Labels
 
 
 # Other Parameters
 HAM_file <- "MultiAxialHierarchy.csv"                # Necessary
 ARPWN_file <- "AllRelationPairsWithNull.Rdata"       # Necessary
 func_file <- "get_eval_embed_funcs.R"                # Utility Functions
-summary_rmd_file <- "summary.Rmd"                    # Summary Rmd file
+rmd_file <- list("html" = "summary_html.Rmd",
+                 "pdf" =  "summary_pdf.Rmd")         # Summary Rmd file
 data_type <- 1                                       # Input data type setting, codi only:1, codi & CUI: 2 
 split_patterns <- list("Similarity" = "(sim)", 
                        "Relation" = "(rela)")        # patterns to split pairs into groups
@@ -107,20 +112,21 @@ cat("\n-------------------------------------------------------------------------
 # Save Summary Data
 dim_str <- strsplit(paste(dims, collapse = ","), ",")[[1]]
 names(summary) <- dim_str
-save(summary, file = paste0("summary-", dims[1], "-", dims[length(dims)], 
-                            "-", dims[2]-dims[1],'.Rdata'))
+data_file <- paste0("summary-", dims[1], "-", dims[length(dims)], 
+                    "-", dims[2]-dims[1],'.Rdata')
+save(summary, file = data_file)
 
 ################################################################################
 
 
-# Get Summary HTML File
+# Get Summary Output File
 ################################################################################
 
 # load summary.Rds if saved
 # load("summary.Rdata")
 
 output_file <- paste0("summary-", dims[1], "-", dims[length(dims)], 
-                    "-", dims[2]-dims[1],'.html')
-rmarkdown::render(summary_rmd_file, output_file = output_file)
+                    "-", dims[2]-dims[1], '.', knit_format)
+rmarkdown::render(rmd_file[[knit_format]], output_file = output_file)
 
 ################################################################################
