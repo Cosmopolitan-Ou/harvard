@@ -1,7 +1,6 @@
 # Self-defined files
-get_eval_embed/MultiAxialHierarchy.csv
-get_eval_embed/AllRelationPairsWithNull.Rdata
-get_eval_embed/rpdr_code_cooccurrence_victor_2019.csv
+keser-i2b2/dungeon
+keser-i2b2/output
 
 # History files
 .Rhistory
