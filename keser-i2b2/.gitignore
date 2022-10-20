@@ -1,10 +1,6 @@
-# Self-defined files （keser-i2b2）
-keser-i2b2/dungeon
-keser-i2b2/output
-keser-i2b2/.Rhistory
-keser-i2b2/.Ruserdata
-keser-i2b2/.Rproj.user/
-keser-i2b2/.Renviron
+# Self-defined files
+dungeon
+output
 
 # History files
 .Rhistory
