@@ -3,8 +3,13 @@
 
 # keser-i2b2
 
-This is a package to: - Generate Embedding - Evaluate Embedding - Get
-Evaluation Plots
+This is a package to:
+
+- Generate Embedding
+
+- Evaluate Embedding
+
+- Get Evaluation Plots
 
 ## Installation
 
@@ -26,10 +31,13 @@ devtools::load_all()
 
 ## Usage
 
-Make sure you have the following files available: - Hierarchy file, such
-as `MultiAxialHierarchy.csv` - Relation pairs file, such as
-`AllRelationPairsWithNull.Rdata` - Input data file, such as
-`rpdr_code_cooccurrence_victor_2019.csv`
+Make sure you have the following files available:
+
+- Hierarchy file, such as `MultiAxialHierarchy.csv`
+
+- Relation pairs file, such as `AllRelationPairsWithNull.Rdata`
+
+- Input data file, such as `rpdr_code_cooccurrence_victor_2019.csv`
 
 Then, You can tune the dimensions on varaible `dims`, each dimension may
 take 26-30 mins to run.
@@ -39,7 +47,7 @@ take 26-30 mins to run.
 For the file paths, change it base on your file locations.
 
 ``` r
-library(keser-i2b2)
+library(keser.i2b2)
 CO_file <- "dungeon//data//rpdr_code_cooccurrence_victor_2019.csv"  # Co-occurrence File: .csv/.parquet/.Rdata
 HAM_file <- "dungeon//data//MultiAxialHierarchy.csv"                # Multi-axial Hierarchy File: .csv/.parquet/.Rdata  
 ARP_file <- "dungeon//data//AllRelationPairsWithNull.Rdata"         # All Relation Pairs File: .csv/.parquet/.Rdata  
@@ -67,6 +75,25 @@ get_report(summary, plot_val = "auc", knit_format = "html")
 `out_dir` folder. If `out_dir` is `NULL` then it will create a folder
 called **output** in your working directly.
 
+#### Retrieve Embedding
+
+Let’s say you picked the best `dim` from the plots, and the value is
+**200**. the way the retrieve it is:
+
+``` r
+my_embed <- summary[["summary"]][["200"]][["embedding"]]
+View(my_embed)
+```
+
+#### Retrieve Evaluation Table
+
+For the same case above, the way to retrieved evaluation table is:
+
+``` r
+my_eval <- summary[["summary"]][["200"]][["evaluation"]]
+View(my_eval)
+```
+
 #### Check Results
 
 The evaluation plots are saved as “Summary-XX-YY-ZZ.html”, and the
@@ -76,3 +103,6 @@ stands for Step.
 
 You can choose a proper dimension and use the corresponding embedding
 for the next steps.
+
+See the [Documentation](https://celehs.github.io/KESER-i2b2/) to learn
+more.
