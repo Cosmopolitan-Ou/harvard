@@ -3,17 +3,25 @@
 #' \code{get_eval_embed} acts as embedding generation & evaluation from co-occurrence data file.
 #' It returns a list of summary including meta-data, evaluation and embedding itself. 
 #' 
-#' @param CO_file Co-ccurrence data file with format '.csv', '.parque' or '.Rdata'.
+#' @param CO_file Co-ccurrence data file with format \code{.csv}, \code{.parquet} or \code{.Rdata}.
 #' The data should be a table with 3 columns V1, V2, V3:
 #' \itemize{
-#' \item{\code{V1}}: Shows the row id (code id).
-#' \item{\code{V2}}: Shows the col id (code id).
+#' \item{\code{V1}}: Shows the row id (code id) or row code pair.
+#' \item{\code{V2}}: Shows the col id (code id) or row code pair..
 #' \item{\code{V3}}: Shows the counts for certain pair.
 #' }
-#' @param HAM_file Multi-axial hierarchy data file with format '.csv', '.parque' or '.Rdata'.
-#' @param ARP_file All relation pairs data file with format '.csv', '.parque' or '.Rdata'.
+#' Note: If V1 & V2 are code ids other than code pairs, a mapping dict offering information 
+#' from id to code pair is needed. Please see \code{CO_dict_file} for details.
+#' @param HAM_file Multi-axial hierarchy data file with format \code{.csv}, \code{.parquet} or \code{.Rdata}.
+#' @param ARP_file All relation pairs data file with format \code{.csv}, \code{.parquet} or \code{.Rdata}.
 #' @param dims A vector of numeric values for dimension.
 #' @param out_dir Output folder, if \code{NULL} then by default set to your_working_directory/output.
+#' @param CO_dict_file A data file with two columns, where:
+#' \itemize{
+#' \item{\code{Column 1}: Shows the name of code pair.}
+#' \item{\code{Column 2}: Shows the corresponding id number.}
+#' }
+#' File format can be \code{.csv}, \code{.parquet} or \code{.Rdata}.
 #' @param data_type If data Does not contain CUI codes, set as \code{1}. Otherwise, set as \code{2}.
 #' @return A list of infomation of meta-data, embedding & evaluation result. It will 
 #' be saved in \code{out_dir} as \code{.Rdata} file. 
@@ -23,6 +31,7 @@ get_eval_embed <- function(CO_file,
                            HAM_file, 
                            ARP_file, 
                            dims,
+                           CO_dict_file = NULL,
                            out_dir = NULL, 
                            data_type = 1) {
       
@@ -35,12 +44,23 @@ get_eval_embed <- function(CO_file,
   dir.create(out_dir, showWarnings = FALSE)
   
   # Load Data
-  cat("Loading data...")
+  cat("Loading data...\n")
   CO <- read_file(CO_file)
   MAH <- read_file(HAM_file)
   ARP <- read_file(ARP_file)
   
+  # Check & Map CO
+  if (class(CO[[1]]) == "integer") {
+    if (is.na(CO_dict_file)) stop("Please provide CO dict.") else {
+      
+      # Map CO If CO Dict Passed
+      CO_dict <- read_file(CO_dict_file)
+      cat("\nMapping CO codes from CO dict...\n")
+      CO <- map_CO(CO, CO_dict)
+    }
+  }
   
+
   # Change CO Column Names
   colnames(CO) <- c("V1", "V2", "V3")
   
@@ -82,6 +102,7 @@ get_eval_embed <- function(CO_file,
     # Get Embedding
     cat("\nGetting embedding...")
     embed = getembedding(SPPMI, dim)
+    save(embed, file =  "embed_AD_tst.Rdata")
     #########################################################################
     
     

@@ -1,6 +1,6 @@
-url: ~
 template:
-  bootstrap: 5
+    params:
+    bootswatch: cosmo
   
 reference:
 - title: "Help Docs for Exported Functions"
@@ -15,4 +15,5 @@ reference:
   - getembedding
   - getSPPMI
   - get_rollup_dict
+  - map_CO
 
